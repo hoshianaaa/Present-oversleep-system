@@ -7,15 +7,15 @@ int stop_sw = 7;
 int start_sw = 6;
 static int stage=1;
 static int flag[4],count;
-int set_h,set_m,all_m,all_s;
+long set_h,set_m,all_m,all_s;
 int val[4];
 static int a;
 static int start_time;
 
 
-int hour(int);
-int mini(int);
-int sec(int);
+int hour(long);
+int mini(long);
+int sec(long);
 
 
 
@@ -142,14 +142,14 @@ void loop() {
       lcd.clear();
      
     }
-   /* Serial.print("  all_s:");
-    Serial.print(all_s);
-    Serial.print("  start_time:");
-    Serial.print(start_time);
-    Serial.print("  millis()/1000:");
-    Serial.print(millis()/1000);
+   Serial.print("  hour:");
+    Serial.print(hour(all_s + start_time - millis()/1000));
+    Serial.print("  mini:");
+    Serial.print(mini(all_s + start_time - millis()/1000));
+    Serial.print("  sec");
+    Serial.print(sec(all_s + start_time - millis()/1000));
     Serial.print("  0に近づくやつ:");
-    Serial.println(all_s + start_time - millis()/1000);*/
+    Serial.println(all_s + start_time - millis()/1000);
     if(all_s + start_time - millis()/1000 == 0)stage = 4;
     if(digitalRead(stop_sw) == LOW){lcd.print("TIMER STOP");delay(1000);count = 0;a = 0;stage = 1;}
   }
@@ -170,6 +170,3 @@ void loop() {
 
   
 }
-
-
- 
