@@ -1,6 +1,10 @@
+  #include <Servo.h>
+
 #include <I2CLiquidCrystal.h>
 #include <Wire.h>
 I2CLiquidCrystal lcd(20, (bool)true); 
+
+Servo servo;
 
 int sw[6] = {2,3,4,5};//sw[0]:60分 sw[1]:-60分 sw[2]:1分 sw[3]:-1分
 int stop_sw = 7;
@@ -11,6 +15,7 @@ long set_h,set_m,all_m,all_s;
 int val[4];
 static int a;
 static int start_time;
+static int i;
 
 
 int hour(long);
@@ -20,6 +25,8 @@ int sec(long);
 
 
 void setup() {
+
+  servo.attach(9);
   // put your setup code here, to run once:
   for(int i=0;i<4;i++)pinMode(sw[i],INPUT_PULLUP);
   pinMode(stop_sw,INPUT_PULLUP);
@@ -34,7 +41,9 @@ void loop() {
 
   //初期コードを入力,
    while(stage == 1){
-
+    count = 0;a = 0;
+    i = 0;
+    servo.write(0);
     stage = 2;   
    }
 
@@ -142,23 +151,34 @@ void loop() {
       lcd.clear();
      
     }
-   Serial.print("  hour:");
-    Serial.print(hour(all_s + start_time - millis()/1000));
+    /*
+    Serial.print("  hour:");
+    Serial.print((all_s + start_time - millis()/1000)/60);
     Serial.print("  mini:");
     Serial.print(mini(all_s + start_time - millis()/1000));
     Serial.print("  sec");
     Serial.print(sec(all_s + start_time - millis()/1000));
     Serial.print("  0に近づくやつ:");
-    Serial.println(all_s + start_time - millis()/1000);
-    if(all_s + start_time - millis()/1000 == 0)stage = 4;
+    Serial.println(all_s + start_time - millis()/1000);*/
+    if(all_s + start_time - millis()/1000 <= 60)stage = 4;
     if(digitalRead(stop_sw) == LOW){lcd.print("TIMER STOP");delay(1000);count = 0;a = 0;stage = 1;}
-  }
-
-//タイマーが0になったときの行動を記入する
+    }
+  
+//タイマーが60秒以下になった時の動作
   while(stage == 4){
-
-    lcd.println(stage);
+    if(all_s + start_time - millis()/1000 <= 60)stage = 5;
+    if(digitalRead(stop_sw) == LOW){lcd.print("TIMER STOP");delay(1000);count = 0;a = 0;stage = 1;}
+    tone(13,262,100);
+     
+     
+  }
+//タイマーが0になったときの行動を記入する
+  while(stage == 5){
     
+    lcd.println("WARNNIG");
+    servo.write(i++);
+    delay(30);
+    if(i >= 150)stage = 1;
     
     
   }
